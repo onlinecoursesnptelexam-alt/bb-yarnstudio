@@ -2,9 +2,6 @@
 node_modules/
 package-lock.json
 
-# Backend (not needed for static hosting)
-backend/
-
 # Environment files
 .env
 .env.local
