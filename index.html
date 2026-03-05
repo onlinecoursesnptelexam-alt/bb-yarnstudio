@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BB YarnStudio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="container nav">
+        <div class="logo">
+            <img src="images/logo.png" alt="BB YarnStudio Logo">
+        </div>
+        <!-- Hamburger --> <div class="hamburger" onclick="openMenu()">☰</div>
+        <!-- Navigation Menu -->
+        <nav class="menu desktop-menu">
+            <a href="index.html">Home</a>
+            <a href="#products">Shop</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </div>
+</header>
+<script>
+function openMenu() {
+    document.getElementById("mobileDrawer").classList.add("active");
+    document.getElementById("drawerOverlay").classList.add("active");
+}
+
+function closeMenu() {
+    document.getElementById("mobileDrawer").classList.remove("active");
+    document.getElementById("drawerOverlay").classList.remove("active");
+}
+</script>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="container hero-content">
+        <h1>Handmade Crochet With Love 🧶</h1>
+        <p>Premium handcrafted crochet products made with passion.</p>
+        <button class="btn">Shop Now</button>
+    </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id = "products" class="products container">
+    <h2>Our Products</h2>
+    <div class="product-grid" id="productGrid">
+        <!-- Products will be dynamically loaded here -->
+    </div>
+</section>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+        <div class="close-btn" onclick="closeMenu()">✖</div>
+    </div>
+    <div class="drawer-welcome">
+        <p>Welcome To<br>BB YarnStudio</p>
+    </div>
+    <div class="drawer-menu">
+        <a href="index.html">Home</a>
+        <a href="#products">Shop</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </div>
+    <div class="drawer-logo">
+        <img src="images/logo.png" alt="BB YarnStudio Logo">
+    </div>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeMenu()"></div>
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="contact-section">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h3>Get in Touch</h3>
+            <p>Interested in our products? Fill out the form below or contact us directly!</p>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <p><strong>Phone & WhatsApp:</strong> <a href="tel:+91908185919" target="_blank" style="color: black">+91 908185919</a></p>
+                <p><strong>Email:</strong> <a href="mailto:BBYARNSTUDIO@GMAIL.COM" target="_blank" style="color: black">BBYARNSTUDIO@GMAIL.COM</a></p>
+
+                <p><strong>Location:</strong>INDIA</p>
+                <div class="social-links">
+                    <p><a href="https://instagram.com/" target="_blank" style="color: red"><i class="fab fa-instagram"></i> Instagram</a></p>
+                    <p><a href="https://wa.me/91908185919" target="_blank" style="color: green"><i class="fab fa-whatsapp"></i> WhatsApp</a></p>
+                    <p><a href="https://facebook.com/" target="_blank" style="color: skyblue"><i class="fab fa-facebook"></i> Facebook</a></p>
+                </div>
+            </div>
+            <div class="contact-form">
+                <p style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                </p>
+                <form
+                    action="https://docs.google.com/forms/d/e/1FAIpQLSeMONopyep6QQg8RmzDJ8vQmBpoZN3t9o3907VRK5W9rnXfVQ/formResponse"
+                    method="POST"
+                    target="hidden_iframe"
+                    onsubmit="debugFormSubmission(event)"
+                >
+                    <input
+                        type="text"
+                        name="entry.1723638550"
+                        placeholder="Your Name"
+                        required
+                    >
+                    <input
+                        type="email"
+                        name="entry.1482576275"
+                        placeholder="Your Email"
+                        required
+                    >
+                    <textarea
+                        name="entry.1276477844"
+                        placeholder="Your Message"
+                        required
+                    ></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hidden iframe for Google Forms -->
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
+<script>
+function debugFormSubmission(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    console.log('Form Submission Details:');
+    console.log('Name field value:', formData.get('entry.1723638550'));
+    console.log('Email field value:', formData.get('entry.1482576275'));
+    console.log('Message field value:', formData.get('entry.1276477844'));
+    
+    // Log all form data
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+    
+    // Submit the form normally after logging
+    event.target.submit();
+    
+    // Show success message
+    setTimeout(() => {
+        alert("Message sent successfully!");
+        event.target.reset();
+    }, 1000);
+}
+
+function showSuccess() {
+    alert("Message sent successfully!");
+    // Reset form after submission
+    document.querySelector('form').reset();
+}
+</script>
+<section class="coming-soon-section">
+    <div class="container coming-content">
+        <h2>Thanks for Visiting 💙</h2>
+        <p>
+            Our website direct orders will be live very soon.
+            You can place your custom crochet orders directly through our contact section.
+        </p>
+
+        <button class="contact-ref-btn" onclick="scrollToContact()">
+            Contact Us Now
+        </button>
+    </div>
+</section>
+<script>function scrollToContact() {
+    document.getElementById("contact").scrollIntoView({
+        behavior: "smooth"
+    });
+}</script>
+<style>/* ===============================
+   Coming Soon Mid Section
+================================ */
+
+.coming-soon-section {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f29c7c, #3c7fa6);
+    text-align: center;
+    color: white;
+}
+
+.coming-content {
+    max-width: 700px;
+    margin: auto;
+}
+
+.coming-soon-section h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.coming-soon-section p {
+    font-size: 16px;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.contact-ref-btn {
+    padding: 12px 28px;
+    background: white;
+    color: #3c7fa6;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.contact-ref-btn:hover {
+    background: #f29c7c;
+    color: white;
+}
+
+/* Desktop Enhancement */
+@media (min-width:768px) {
+    .coming-soon-section h2 {
+        font-size: 36px;
+    }
+
+    .coming-soon-section p {
+        font-size: 18px;
+    }
+}</style>"
+
+<section id="about" class="about-section" id="about">
+    <div class="container about-grid">
+
+        <div class="about-text">
+            <h2>About BB YarnStudio</h2>
+            <p>
+                BB YarnStudio is a <span style="color: rgb(33, 174, 240)">handmade</span> crochet brand built with love,
+                creativity, and attention to detail. Every product is crafted
+                carefully using <span style="color: #f29c7c">premium</span> yarn and modern crochet techniques.
+            </p>
+            <p>
+                We believe <span style="color: rgb(27, 160, 212)">handmade</span> products carry warmth and personality.
+                Our mission is to deliver beautiful, <span style="color: #4CAF50">affordable</span> crochet
+                pieces that feel <span style="color: #FF6B6B">special</span> and <span style="color: #9C27B0">unique</span>.
+            </p>
+        </div>
+
+        <div class="about-image">
+            <img src="images/logo.png" alt="Handmade Crochet">
+        </div>
+
+    </div>
+</section>
+<footer class="footer">
+    <div class="container footer-grid">
+
+        <div>
+            <h3>BB YarnStudio</h3>
+            <p>Premium handmade crochet products crafted with love.</p>
+        </div>
+
+        <div>
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#products"><i class="fas fa-shopping-cart"></i> Shop</a></li>
+                <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4>Follow Us</h4>
+             <ul>
+                 <li><a href="https://instagram.com/BBYARNSTUDIO" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
+                 <li><a href="https://wa.me/+91908185919" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                 <li><a href="https://facebook.com/" target="_blank"><i class="fab fa-facebook"></i> Facebook</a></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+        © 2026 BB YarnStudio. All Rights Reserved.
+    </div>
+</footer>
+<script src="backend/script.js"></script>
+</body>
+</html>

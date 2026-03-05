@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Backend (not needed for static hosting)
+backend/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+
+# Temporary files
+tmp/
+temp/

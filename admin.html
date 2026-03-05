@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - BB YarnStudio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .admin-header {
+            background: #3c7fa6;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .product-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #3c7fa6;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: #3c7fa6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .products-list {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .product-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-info h4 {
+            margin: 0 0 5px 0;
+            color: #3c7fa6;
+        }
+        .product-info p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3c7fa6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            color: #f29c7c;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <a href="index.html" class="back-link">← Back to Store</a>
+        
+        <div class="admin-header">
+            <h1>Admin Panel</h1>
+            <p>Manage your products inventory</p>
+        </div>
+
+        <div class="product-form">
+            <h3 id="formTitle">Add New Product</h3>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">Product Name</label>
+                    <input type="text" id="productName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productDescription">Description</label>
+                    <textarea id="productDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="productImage">Product Image</label>
+                    <input type="file" id="productImageFile" accept="image/*" onchange="previewImage(event)" required>
+                    <input type="hidden" id="productImage" placeholder="productimg/filename.jpg">
+                    <img id="imagePreview" style="max-width: 200px; margin-top: 10px; display: none; border-radius: 8px;">
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">Upload image (required)</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="discountPrice">Discount Price (₹)</label>
+                    <input type="number" id="discountPrice" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="originalPrice">Original Price (₹)</label>
+                    <input type="number" id="originalPrice" required>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary" id="submitBtn">Add Product</button>
+                    <button type="button" class="btn-secondary" id="cancelBtn" style="display: none;">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="products-list">
+            <h3>Current Products</h3>
+            <div id="productsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load products from server API
+        let products = [];
+        let editingProductId = null;
+
+        // Load products from server
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/products');
+                if (response.ok) {
+                    products = await response.json();
+                    // Sort products by ID in descending order (newest first)
+                    products.sort((a, b) => b.id - a.id);
+                } else {
+                    console.error('Error loading products from server');
+                    // Fallback to localStorage
+                    products = JSON.parse(localStorage.getItem('adminProducts')) || getDefaultProducts();
+                    // Sort products by ID in descending order (newest first)
+                    products.sort((a, b) => b.id - a.id);
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                // Fallback to localStorage
+                products = JSON.parse(localStorage.getItem('adminProducts')) || getDefaultProducts();
+                // Sort products by ID in descending order (newest first)
+                products.sort((a, b) => b.id - a.id);
+            }
+            renderProducts();
+        }
+
+        // Default products if no data exists
+        function getDefaultProducts() {
+            return [
+                {
+                    id: 1,
+                    name: 'Crochet Handbag',
+                    description: 'Stylish handmade crochet handbag.',
+                    image: 'productimg/handbag.jpg',
+                    discountPrice: 999,
+                    originalPrice: 1499
+                },
+                {
+                    id: 2,
+                    name: 'Crochet Summer Top',
+                    description: 'Lightweight and breathable design.',
+                    image: 'productimg/top.jpg',
+                    discountPrice: 799,
+                    originalPrice: 1199
+                }
+            ];
+        }
+
+        // Save products to server
+        async function saveProducts() {
+            // Products are saved to server via API calls
+            // This function is kept for compatibility
+            console.log('Products saved via API calls');
+        }
+
+        // Preview uploaded image
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const imageInput = document.getElementById('productImage');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Render products list
+        function renderProducts() {
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+
+            products.forEach(product => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item';
+                productItem.innerHTML = `
+                    <div class="product-info">
+                        <h4>${product.name}</h4>
+                        <p>${product.description}</p>
+                        <p>Price: ₹${product.discountPrice} <span style="text-decoration: line-through; color: #999;">₹${product.originalPrice}</span></p>
+                        <p>Image: ${product.image}</p>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-primary" onclick="editProduct(${product.id})">Edit</button>
+                        <button class="btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                    </div>
+                `;
+                productsList.appendChild(productItem);
+            });
+        }
+
+        // Add or update product
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('name', document.getElementById('productName').value);
+            formData.append('description', document.getElementById('productDescription').value);
+            formData.append('discountPrice', document.getElementById('discountPrice').value);
+            formData.append('originalPrice', document.getElementById('originalPrice').value);
+            
+            const imageFile = document.getElementById('productImageFile').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            try {
+                let response;
+                if (editingProductId) {
+                    // Update existing product
+                    response = await fetch(`/api/products/${editingProductId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                } else {
+                    // Add new product
+                    response = await fetch('/api/products', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Product saved successfully:', result);
+                    await loadProducts();
+                    resetForm();
+                } else {
+                    console.error('Error saving product:', await response.text());
+                    alert('Error saving product. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error saving product. Please check your connection.');
+            }
+        });
+
+        // Edit product
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (product) {
+                editingProductId = id;
+                document.getElementById('productId').value = id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productDescription').value = product.description;
+                document.getElementById('productImage').value = product.image;
+                document.getElementById('discountPrice').value = product.discountPrice;
+                document.getElementById('originalPrice').value = product.originalPrice;
+                
+                // Show image preview if exists
+                const preview = document.getElementById('imagePreview');
+                if (product.image && product.image !== 'productimg/default.jpg') {
+                    preview.src = product.image;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+                
+                document.getElementById('formTitle').textContent = 'Edit Product';
+                document.getElementById('submitBtn').textContent = 'Update Product';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                
+                // Scroll to form
+                document.querySelector('.product-form').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Delete product
+        async function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                try {
+                    const response = await fetch(`/api/products/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        console.log('Product deleted successfully');
+                        await loadProducts();
+                    } else {
+                        console.error('Error deleting product:', await response.text());
+                        alert('Error deleting product. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error deleting product. Please check your connection.');
+                }
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+            editingProductId = null;
+            document.getElementById('formTitle').textContent = 'Add New Product';
+            document.getElementById('submitBtn').textContent = 'Add Product';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        // Cancel edit
+        document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
+    </script>
+</body>
+</html>
