@@ -5,17 +5,21 @@ const multer = require('multer');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+// Define absolute paths
+const productinfoPath = path.join(__dirname, 'productinfo.json');
+const productimgDir = path.join(__dirname, 'productimg');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static(__dirname));
 
 // Configure multer for image uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'productimg/');
+        cb(null, productimgDir);
     },
     filename: function (req, file, cb) {
         // Generate unique filename
@@ -40,12 +44,12 @@ const upload = multer({
 });
 
 // Ensure productimg folder exists
-if (!fs.existsSync('productimg')) {
-    fs.mkdirSync('productimg');
+if (!fs.existsSync(productimgDir)) {
+    fs.mkdirSync(productimgDir, { recursive: true });
 }
 
 // Ensure productinfo.json exists
-if (!fs.existsSync('productinfo.json')) {
+if (!fs.existsSync(productinfoPath)) {
     const defaultProducts = [
         {
             id: 1,
@@ -64,7 +68,7 @@ if (!fs.existsSync('productinfo.json')) {
             originalPrice: 1199
         }
     ];
-    fs.writeFileSync('productinfo.json', JSON.stringify(defaultProducts, null, 2));
+    fs.writeFileSync(productinfoPath, JSON.stringify(defaultProducts, null, 2));
 }
 
 // API Routes
@@ -72,9 +76,10 @@ if (!fs.existsSync('productinfo.json')) {
 // Get all products
 app.get('/api/products', (req, res) => {
     try {
-        const products = JSON.parse(fs.readFileSync('productinfo.json', 'utf8'));
+        const products = JSON.parse(fs.readFileSync(productinfoPath, 'utf8'));
         res.json(products);
     } catch (error) {
+        console.error('Error reading products:', error);
         res.status(500).json({ error: 'Error reading products' });
     }
 });
@@ -82,7 +87,7 @@ app.get('/api/products', (req, res) => {
 // Add new product
 app.post('/api/products', upload.single('image'), (req, res) => {
     try {
-        const products = JSON.parse(fs.readFileSync('productinfo.json', 'utf8'));
+        const products = JSON.parse(fs.readFileSync(productinfoPath, 'utf8'));
         
         const newProduct = {
             id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
@@ -94,10 +99,11 @@ app.post('/api/products', upload.single('image'), (req, res) => {
         };
         
         products.push(newProduct);
-        fs.writeFileSync('productinfo.json', JSON.stringify(products, null, 2));
+        fs.writeFileSync(productinfoPath, JSON.stringify(products, null, 2));
         
         res.json(newProduct);
     } catch (error) {
+        console.error('Error saving product:', error);
         res.status(500).json({ error: 'Error saving product' });
     }
 });
@@ -105,7 +111,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
 // Update product
 app.put('/api/products/:id', upload.single('image'), (req, res) => {
     try {
-        const products = JSON.parse(fs.readFileSync('productinfo.json', 'utf8'));
+        const products = JSON.parse(fs.readFileSync(productinfoPath, 'utf8'));
         const index = products.findIndex(p => p.id === parseInt(req.params.id));
         
         if (index === -1) {
@@ -128,10 +134,11 @@ app.put('/api/products/:id', upload.single('image'), (req, res) => {
             products[index].image = req.body.image;
         }
         
-        fs.writeFileSync('productinfo.json', JSON.stringify(products, null, 2));
+        fs.writeFileSync(productinfoPath, JSON.stringify(products, null, 2));
         
         res.json(products[index]);
     } catch (error) {
+        console.error('Error updating product:', error);
         res.status(500).json({ error: 'Error updating product' });
     }
 });
@@ -139,7 +146,7 @@ app.put('/api/products/:id', upload.single('image'), (req, res) => {
 // Delete product
 app.delete('/api/products/:id', (req, res) => {
     try {
-        const products = JSON.parse(fs.readFileSync('productinfo.json', 'utf8'));
+        const products = JSON.parse(fs.readFileSync(productinfoPath, 'utf8'));
         const index = products.findIndex(p => p.id === parseInt(req.params.id));
         
         if (index === -1) {
@@ -156,20 +163,18 @@ app.delete('/api/products/:id', (req, res) => {
         }
         
         products.splice(index, 1);
-        fs.writeFileSync('productinfo.json', JSON.stringify(products, null, 2));
+        fs.writeFileSync(productinfoPath, JSON.stringify(products, null, 2));
         
         res.json({ message: 'Product deleted successfully' });
     } catch (error) {
+        console.error('Error deleting product:', error);
         res.status(500).json({ error: 'Error deleting product' });
     }
 });
 
-// Serve static files
-app.use(express.static('.'));
-
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
-    console.log('Admin panel: http://localhost:3000/admin.html');
-    console.log('Main site: http://localhost:3000/index.html');
+    console.log('Admin panel: http://localhost:' + PORT + '/admin.html');
+    console.log('Main site: http://localhost:' + PORT + '/index.html');
 });
