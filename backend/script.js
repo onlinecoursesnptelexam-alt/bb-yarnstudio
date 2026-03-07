@@ -50,6 +50,9 @@ document.querySelector(".btn").addEventListener("click", function() {
 });
 
 // Load products from server API
+let allProducts = []; // Store all products for filtering
+let currentFilter = 'all'; // Current active filter
+
 async function loadProducts() {
     console.log('Loading products from server...');
     try {
@@ -66,31 +69,14 @@ async function loadProducts() {
         // Sort products by ID in descending order (newest first)
         products.sort((a, b) => b.id - a.id);
         
-        const productGrid = document.getElementById('productGrid');
+        // Store all products for filtering
+        allProducts = products;
         
-        if (productGrid) {
-            productGrid.innerHTML = '';
-            
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" onerror="this.src='images/krishna.jpeg'">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <div class="price">
-                        <span class="discount-price">₹${product.discountPrice}</span>
-                        <span class="original-price">₹${product.originalPrice}</span>
-                    </div>
-                `;
-                productGrid.appendChild(productCard);
-            });
-            
-            console.log('Products rendered to grid');
-            addBuyNowButtons();
-        } else {
-            console.error('Product grid not found');
-        }
+        // Apply current filter
+        filterProducts(currentFilter);
+        
+        console.log('Products rendered to grid');
+        addBuyNowButtons();
     } catch (error) {
         console.error('Error loading products from server:', error);
         console.log('Falling back to localStorage...');
@@ -102,28 +88,53 @@ async function loadProducts() {
         // Sort products by ID in descending order (newest first)
         products.sort((a, b) => b.id - a.id);
         
-        const productGrid = document.getElementById('productGrid');
+        // Store all products for filtering
+        allProducts = products;
         
-        if (productGrid) {
-            productGrid.innerHTML = '';
-            
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" onerror="this.src='images/krishna.jpeg'">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <div class="price">
-                        <span class="discount-price">₹${product.discountPrice}</span>
-                        <span class="original-price">₹${product.originalPrice}</span>
-                    </div>
-                `;
-                productGrid.appendChild(productCard);
-            });
-            addBuyNowButtons();
-        }
+        // Apply current filter
+        filterProducts(currentFilter);
+        
+        addBuyNowButtons();
     }
+}
+
+// Filter products by category
+function filterProducts(category) {
+    currentFilter = category;
+    const productGrid = document.getElementById('productGrid');
+    
+    if (!productGrid) {
+        console.error('Product grid not found');
+        return;
+    }
+    
+    productGrid.innerHTML = '';
+    
+    // Filter products based on category
+    const filteredProducts = category === 'all' 
+        ? allProducts 
+        : allProducts.filter(product => product.category === category);
+    
+    console.log(`Filtering by category: ${category}, showing ${filteredProducts.length} products`);
+    
+    filteredProducts.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+            <img src="${product.image}" alt="${product.name}" onerror="this.src='images/krishna.jpeg'">
+            <h3>${product.name}</h3>
+            <p class="product-category">${product.category || 'Uncategorized'}</p>
+            <p>${product.description}</p>
+            <div class="price">
+                <span class="discount-price">₹${product.discountPrice}</span>
+                <span class="original-price">₹${product.originalPrice}</span>
+            </div>
+        `;
+        productGrid.appendChild(productCard);
+    });
+    
+    // Add Buy Now buttons after filtering
+    setTimeout(addBuyNowButtons, 100);
 }
 
 // Add Buy Now buttons to product cards
@@ -147,5 +158,20 @@ document.addEventListener('DOMContentLoaded', function() {
     loadProducts().then(() => {
         // Add Buy Now buttons after products are loaded
         setTimeout(addBuyNowButtons, 100);
+    });
+    
+    // Add filter tab event listeners
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            filterTabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Filter products by selected category
+            const category = this.getAttribute('data-category');
+            filterProducts(category);
+        });
     });
 });

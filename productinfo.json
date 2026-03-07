@@ -3,6 +3,7 @@
     "id": 2,
     "name": "Crochet Summer Top",
     "description": "Lightweight and breathable design.",
+    "category": "Uncategorized",
     "image": "productimg/top.jpg",
     "discountPrice": 799,
     "originalPrice": 1199
@@ -11,6 +12,7 @@
     "id": 3,
     "name": "Handmade Crochet Toy",
     "description": "Soft and cute handmade toy.",
+    "category": "plush toy",
     "image": "productimg/toy.jpg",
     "discountPrice": 599,
     "originalPrice": 899
@@ -19,6 +21,7 @@
     "id": 4,
     "name": "Elegant Crochet Shawl",
     "description": "Perfect for winter and festive looks.",
+    "category": "Uncategorized",
     "image": "productimg/shawl.jpg",
     "discountPrice": 1299,
     "originalPrice": 1899
@@ -27,16 +30,9 @@
     "id": 5,
     "name": "Cute Crochet Keychain",
     "description": "Perfect gift for loved ones.",
+    "category": "keychain",
     "image": "productimg/keychain.jpg",
     "discountPrice": 199,
     "originalPrice": 299
-  },
-  {
-    "id": 6,
-    "name": "Crochet Cushion Cover",
-    "description": "Handcrafted home decor piece.",
-    "image": "productimg/cushion.jpg",
-    "discountPrice": 699,
-    "originalPrice": 999
   }
 ]

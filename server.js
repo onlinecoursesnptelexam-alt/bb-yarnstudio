@@ -55,6 +55,7 @@ if (!fs.existsSync(productinfoPath)) {
             id: 1,
             name: 'Crochet Handbag',
             description: 'Stylish handmade crochet handbag.',
+            category: 'handbags',
             image: 'productimg/handbag.jpg',
             discountPrice: 999,
             originalPrice: 1499
@@ -63,6 +64,7 @@ if (!fs.existsSync(productinfoPath)) {
             id: 2,
             name: 'Crochet Summer Top',
             description: 'Lightweight and breathable design.',
+            category: 'Uncategorized',
             image: 'productimg/top.jpg',
             discountPrice: 799,
             originalPrice: 1199
@@ -93,6 +95,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
             id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
             name: req.body.name,
             description: req.body.description,
+            category: req.body.category || 'Uncategorized',
             image: req.file ? 'productimg/' + req.file.filename : req.body.image || 'productimg/default.jpg',
             discountPrice: parseInt(req.body.discountPrice),
             originalPrice: parseInt(req.body.originalPrice)
@@ -123,6 +126,7 @@ app.put('/api/products/:id', upload.single('image'), (req, res) => {
             ...products[index],
             name: req.body.name,
             description: req.body.description,
+            category: req.body.category || products[index].category || 'Uncategorized',
             discountPrice: parseInt(req.body.discountPrice),
             originalPrice: parseInt(req.body.originalPrice)
         };
